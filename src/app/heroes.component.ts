@@ -1,21 +1,31 @@
 import { Component, OnInit } from '@angular/core';
 import {Hero} from "./hero";
-import {HeroService} from "./shared/hero.service";
+import {HeroService} from "./hero.service";
+import {Router} from "@angular/router";
+
 // import {HEROES} from "./mock-heroes";
 
 @Component({
   selector: 'my-heroes',
-  providers: [HeroService],
   template: `
 
-<my-hero-detail [hero]="selectedHero"></my-hero-detail>
+<!--<my-hero-detail [hero]="selectedHero"></my-hero-detail>-->
 
 
 <ul class="heroes">
-  <li *ngFor="let hero of heroes" (click)="onSelect(hero)">
+  <li *ngFor="let hero of heroes"
+    [class.selected]="hero === selectedHero"
+    (click)="onSelect(hero)">
     <span class="badge">{{hero.id}}</span> {{hero.name}}
   </li>
 </ul>
+
+<div *ngIf="selectedHero">
+  <h2>
+    {{selectedHero.name | uppercase}} is my hero
+  </h2>
+  <button (click)="gotoDetail()">View Details</button>
+</div>
 
 
 `,
@@ -70,15 +80,11 @@ import {HeroService} from "./shared/hero.service";
 `]
 
 })
-export class HeroesComponent {
-  constructor(private heroService: HeroService){}
+export class HeroesComponent implements OnInit{
+  constructor(private heroService: HeroService, private  router: Router){}
 
   heroes: Hero[];
   selectedHero: Hero;
-
-  ngOnInit(): void{
-    this.getHeroes();
-  }
 
   getHeroes(): void {
     // this.heroes = this.heroService.getHeroes();
@@ -87,5 +93,13 @@ export class HeroesComponent {
 
   onSelect(hero: Hero): void{
     this.selectedHero = hero;
+  }
+
+  ngOnInit() : void {
+    this.getHeroes()
+  }
+
+  gotoDetail(): void {
+    this.router.navigate(['/detail', this.selectedHero.id]);
   }
 }
